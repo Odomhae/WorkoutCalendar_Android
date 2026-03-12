@@ -1,5 +1,6 @@
 package com.odom.workouts.ui.calendar
 
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -33,6 +34,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -46,6 +48,7 @@ import com.odom.workouts.ui.home.HomeViewModel
 import com.odom.workouts.utils.Routes
 import com.odom.workouts.utils.UiEvent
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -127,7 +130,34 @@ fun CalendarScreen(
         modifier = Modifier.fillMaxWidth(),
         tonalElevation = 2.dp
       ) {
-        Column {
+        Column(
+          modifier = Modifier
+            .pointerInput(Unit) {
+              var totalDragX = 0f
+              detectDragGestures(
+                onDragStart = { totalDragX = 0f },
+                onDragEnd = {
+                  val threshold = 100f
+                  if (abs(totalDragX) > threshold) {
+                    when {
+                      totalDragX > 0 -> {
+                        // Swipe right - previous month
+                        viewModel.navigateToPreviousMonth()
+                      }
+                      totalDragX < 0 -> {
+                        // Swipe left - next month
+                        viewModel.navigateToNextMonth()
+                      }
+                    }
+                  }
+                }
+              ) { _, dragAmount ->
+                if (abs(dragAmount.x) > abs(dragAmount.y)) {
+                  totalDragX += dragAmount.x
+                }
+              }
+            }
+        ) {
           CalendarHeader(
             currentMonth = currentMonth,
             onPreviousMonth = { viewModel.navigateToPreviousMonth() },
