@@ -42,19 +42,27 @@ class CalendarViewModel @Inject constructor(
     )
 
   // Workout data for selected date
-  val workoutsForSelectedDate: StateFlow<List<SessionWrapper>> = selectedDate
+  val workoutsForSelectedDate: StateFlow<List<ExerciseWrapper>> = selectedDate
     .flatMapLatest { date ->
       combine(
         repo.getSessionsForDate(date),
         repo.getAllSessionExercises(),
+        repo.getAllSets(),
         prefsRepo.secondaryMuscleWeight
-      ) { sessions, sessionExercises, secondaryWeight ->
-        sessions.map { session ->
-          val muscleGroups = sessionExercises
+      ) { sessions, sessionExercises, sets, secondaryWeight ->
+        sessions.flatMap { session ->
+          val sessionExerciseList = sessionExercises
             .filter { it.sessionExercise.parentSessionId == session.sessionId }
-            .sortedListOfMuscleGroups(secondaryWeight.toDouble())
-          SessionWrapper(session, muscleGroups)
-        //  ExerciseWrapper(sessionExercises, muscleGroups,,) // todo jihoon
+          
+          sessionExerciseList.map { sessionExerciseWithExercise ->
+            val exerciseSets = sets.filter { it.parentSessionExerciseId == sessionExerciseWithExercise.sessionExercise.sessionExerciseId }
+            
+            ExerciseWrapper(
+              sessionExercise = sessionExerciseWithExercise.sessionExercise,
+              exercise = sessionExerciseWithExercise.exercise,
+              sets = exerciseSets
+            )
+          }
         }
       }
     }

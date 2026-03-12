@@ -157,7 +157,7 @@ fun CalendarScreen(
           }
         },
         onWorkoutClick = { session ->
-          onNavigate(UiEvent.Navigate("${Routes.SESSION}/${session.sessionId}"))
+          onNavigate(UiEvent.Navigate("${Routes.SESSION}/${session.sessionExerciseId}"))
         },
         modifier = Modifier.padding(horizontal = 16.dp)
       )

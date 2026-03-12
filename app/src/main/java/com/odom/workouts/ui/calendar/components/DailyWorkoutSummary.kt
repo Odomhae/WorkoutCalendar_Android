@@ -21,16 +21,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.odom.workouts.ui.SessionWrapper
+import com.odom.workouts.db.entities.SessionExercise
+import com.odom.workouts.ui.ExerciseWrapper
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
 fun DailyWorkoutSummary(
   date: LocalDate,
-  workouts: List<SessionWrapper>,
+  workouts: List<ExerciseWrapper>,
   onAddWorkout: () -> Unit,
-  onWorkoutClick: (com.odom.workouts.db.entities.Session) -> Unit,
+  onWorkoutClick: (SessionExercise) -> Unit,
   modifier: Modifier = Modifier
 ) {
   val dateFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy")
@@ -45,9 +46,9 @@ fun DailyWorkoutSummary(
       // Date header
       Text(
         text = date.format(dateFormatter),
-        style = MaterialTheme.typography.headlineSmall,
+        style = MaterialTheme.typography.bodyMedium,
         fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(bottom = 12.dp)
+        modifier = Modifier.padding(bottom = 8.dp)
       )
       
       if (workouts.isEmpty()) {
@@ -87,13 +88,13 @@ private fun EmptyWorkoutDay(
 
 @Composable
 private fun WorkoutDayList(
-  workouts: List<SessionWrapper>,
-  onWorkoutClick: (com.odom.workouts.db.entities.Session) -> Unit,
+  workouts: List<ExerciseWrapper>,
+  onWorkoutClick: (SessionExercise) -> Unit,
   onAddWorkout: () -> Unit
 ) {
   Column {
     LazyColumn(
-      verticalArrangement = Arrangement.spacedBy(8.dp),
+      verticalArrangement = Arrangement.spacedBy(4.dp),
       modifier = Modifier.heightIn(max = 300.dp)
     ) {
       items(workouts) { workout ->
@@ -117,21 +118,12 @@ private fun WorkoutDayList(
 
 @Composable
 private fun WorkoutDayItem(
-  workout: SessionWrapper,
-  onWorkoutClick: (com.odom.workouts.db.entities.Session) -> Unit
+  workout: ExerciseWrapper,
+  onWorkoutClick: (SessionExercise) -> Unit
 ) {
-  val timeFormatter = DateTimeFormatter.ofPattern("h:mm a")
-  val duration = if (workout.session.end != null) {
-    val duration = java.time.Duration.between(workout.session.start, workout.session.end)
-    "${duration.toMinutes()} min"
-  } else {
-    "In progress"
-  }
-
-  
   Card(
     modifier = Modifier.fillMaxWidth(),
-    onClick = { onWorkoutClick(workout.session) }
+    onClick = { onWorkoutClick(workout.sessionExercise) }
   ) {
     Row(
       modifier = Modifier
@@ -141,16 +133,9 @@ private fun WorkoutDayItem(
       verticalAlignment = Alignment.CenterVertically
     ) {
       Column(modifier = Modifier.weight(1f)) {
-        Text(
-          text = workout.session.start.format(timeFormatter),
-          style = MaterialTheme.typography.bodyMedium,
-          fontWeight = FontWeight.Medium
-        )
         
         Text(
-          text = if (workout.muscleGroups.isNotEmpty()) {
-            workout.muscleGroups.joinToString(", ") { it.toString() }
-          } else {
+          text = workout.exercise.title.ifEmpty {
             "No exercises recorded"
           },
           style = MaterialTheme.typography.bodySmall,
@@ -159,9 +144,9 @@ private fun WorkoutDayItem(
           overflow = TextOverflow.Ellipsis
         )
       }
-      
+
       Text(
-        text = duration,
+        text = "Total Volume",
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.primary,
         fontWeight = FontWeight.Medium
