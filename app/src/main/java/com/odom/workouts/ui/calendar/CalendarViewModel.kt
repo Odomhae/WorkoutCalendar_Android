@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.odom.workouts.db.GymRepository
 import com.odom.workouts.db.UserPreferencesRepository
+import com.odom.workouts.ui.ExerciseWrapper
 import com.odom.workouts.ui.SessionWrapper
 import com.odom.workouts.utils.sortedListOfMuscleGroups
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -53,6 +54,7 @@ class CalendarViewModel @Inject constructor(
             .filter { it.sessionExercise.parentSessionId == session.sessionId }
             .sortedListOfMuscleGroups(secondaryWeight.toDouble())
           SessionWrapper(session, muscleGroups)
+        //  ExerciseWrapper(sessionExercises, muscleGroups,,) // todo jihoon
         }
       }
     }

@@ -31,7 +31,7 @@ fun NavHost(
 
       composable(Routes.CALENDAR) {
         CalendarScreen(
-          onNavigate = { navController.navigationEvent(event = it as UiEvent.Navigate) }
+          onNavigate = { navController.navigationEvent(event = it ) }
         )
       }
 
