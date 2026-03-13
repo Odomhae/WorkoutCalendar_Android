@@ -138,9 +138,9 @@ class SessionViewModel @Inject constructor(
       }
 
       is SessionEvent.RemoveSession -> {
-        sendUiEvent(UiEvent.Navigate(Routes.HOME, popBackStack = true))
         viewModelScope.launch {
           repo.removeSession(_session.value)
+          sendUiEvent(UiEvent.Navigate(Routes.CALENDAR, popBackStack = true))
         }
       }
 
