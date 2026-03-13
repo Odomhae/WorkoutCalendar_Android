@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import java.time.LocalDate
@@ -95,6 +96,14 @@ class CalendarViewModel @Inject constructor(
   }
 
   suspend fun createWorkoutForSelectedDate(): Long {
-    return repo.createWorkoutForDate(_selectedDate.value)
+    // Check if session already exists for selected date
+    val existingSessions = repo.getSessionsForDate(_selectedDate.value).first()
+    return if (existingSessions.isNotEmpty()) {
+      // Use existing session
+      existingSessions.first().sessionId
+    } else {
+      // Create new session
+      repo.createWorkoutForDate(_selectedDate.value)
+    }
   }
 }
