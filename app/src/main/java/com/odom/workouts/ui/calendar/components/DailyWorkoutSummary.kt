@@ -81,7 +81,7 @@ private fun EmptyWorkoutDay(
     Button(
       onClick = onAddWorkout
     ) {
-      Text("Add Workout")
+      Text("Start Workout")
     }
   }
 }
@@ -111,7 +111,7 @@ private fun WorkoutDayList(
       onClick = onAddWorkout,
       modifier = Modifier.fillMaxWidth()
     ) {
-      Text("Add Another Workout")
+      Text("Add Exercise")
     }
   }
 }

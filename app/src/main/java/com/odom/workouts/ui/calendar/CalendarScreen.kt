@@ -182,12 +182,12 @@ fun CalendarScreen(
           viewModel.viewModelScope.launch {
             val sessionId = viewModel.createWorkoutForSelectedDate()
             if (sessionId > 0) {
-              onNavigate(UiEvent.Navigate("${Routes.SESSION}/$sessionId"))
+              onNavigate(UiEvent.Navigate("${Routes.SESSION}/$sessionId")) // EXERCISE_PICKER
             }
           }
         },
-        onWorkoutClick = { session ->
-          onNavigate(UiEvent.Navigate("${Routes.SESSION}/${session.sessionExerciseId}"))
+        onWorkoutClick = { sessionExercise ->
+          onNavigate(UiEvent.Navigate("${Routes.SESSION}/${sessionExercise.parentSessionId}"))
         },
         modifier = Modifier.padding(horizontal = 16.dp)
       )
