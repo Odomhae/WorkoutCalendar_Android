@@ -352,16 +352,17 @@ fun SessionScreen(
             onDeleteSession = { deleteSessionDialog = true },
             onEndTime = { endTimeDialogState.show() },
             onStartTime = { startTimeDialogState.show() },
-            timerState = timerState,
-            timerVisible = timerVisible,
-            onTimerButtonClick = { timerVisible = !timerVisible },
+            onIntensityChange = { viewModel.onEvent(SessionEvent.SetIntensity(it)) },
             onToggleEdit = {
               if (sessionWrapper.session.end == null) {
                 endTimeDialogState.show()
               } else {
                 screenUnlocked = !screenUnlocked
               }
-            })
+            },
+            timerState = timerState,
+            timerVisible = timerVisible,
+            onTimerButtonClick = { timerVisible = !timerVisible })
         }
         stickyHeader {
           if (screenUnlocked && timerVisible) {

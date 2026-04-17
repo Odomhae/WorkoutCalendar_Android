@@ -35,7 +35,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -61,6 +60,7 @@ fun CalendarScreen(
   val selectedDate by viewModel.selectedDate.collectAsStateWithLifecycle()
   val currentMonth by viewModel.currentMonth.collectAsStateWithLifecycle()
   val workoutDates by viewModel.workoutDatesForMonth.collectAsStateWithLifecycle()
+  val workoutIntensities by viewModel.workoutIntensitiesForMonth.collectAsStateWithLifecycle()
   val workouts by viewModel.workoutsForSelectedDate.collectAsStateWithLifecycle()
   
   val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -80,14 +80,13 @@ fun CalendarScreen(
     modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
     topBar = {
       TopAppBar(
-      // todo jihoon    expandedHeight = expandedHeight,
         scrollBehavior = scrollBehavior,
         contentPadding = PaddingValues(0.dp),
         title = {
           Column(
             modifier = Modifier
               .fillMaxWidth()
-              .windowInsetsPadding(WindowInsets.statusBars) // Prevents overlapping status bar
+              .windowInsetsPadding(WindowInsets.statusBars)
               .padding(start = 8.dp, end = 16.dp, top = 24.dp),
             verticalArrangement = Arrangement.Top
           ) {
@@ -106,13 +105,9 @@ fun CalendarScreen(
             }
             Text(
               text = tagline,
-              style = MaterialTheme.typography.labelLargeEmphasized,
+              style = MaterialTheme.typography.labelLarge, // Adjusted from labelLargeEmphasized if not available
               color = MaterialTheme.colorScheme.secondary,
             )
-
-            // Using a Spacer with the expanded height effectively pushes
-            // the content above it to the top of the internal layout box.
-         // todo jihoon    Spacer(modifier = Modifier.height(expandedHeight))
           }
         }
       )
@@ -141,11 +136,9 @@ fun CalendarScreen(
                   if (abs(totalDragX) > threshold) {
                     when {
                       totalDragX > 0 -> {
-                        // Swipe right - previous month
                         viewModel.navigateToPreviousMonth()
                       }
                       totalDragX < 0 -> {
-                        // Swipe left - next month
                         viewModel.navigateToNextMonth()
                       }
                     }
@@ -169,6 +162,7 @@ fun CalendarScreen(
             selectedDate = selectedDate,
             currentMonth = currentMonth,
             workoutDates = workoutDates,
+            workoutIntensities = workoutIntensities,
             onDateSelected = { date -> viewModel.selectDate(date) }
           )
         }
@@ -182,7 +176,7 @@ fun CalendarScreen(
           viewModel.viewModelScope.launch {
             val sessionId = viewModel.createWorkoutForSelectedDate()
             if (sessionId > 0) {
-              onNavigate(UiEvent.Navigate("${Routes.SESSION}/$sessionId")) // EXERCISE_PICKER
+              onNavigate(UiEvent.Navigate("${Routes.SESSION}/$sessionId"))
             }
           }
         },

@@ -190,6 +190,15 @@ class SessionViewModel @Inject constructor(
         }
       }
 
+      is SessionEvent.SetIntensity -> {
+        viewModelScope.launch {
+          repo.updateSession(_session.value.copy(intensity = event.intensity))
+          withContext(Dispatchers.IO) {
+            _session.value = repo.getSessionById(_session.value.sessionId)
+          }
+        }
+      }
+
       else -> Unit
     }
   }

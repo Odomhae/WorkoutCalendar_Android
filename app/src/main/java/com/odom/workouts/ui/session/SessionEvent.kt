@@ -23,4 +23,6 @@ sealed class SessionEvent : Event {
 
   data class SetStartTime(val newTime: LocalTime) : SessionEvent()
   data class SetEndTime(val newTime: LocalTime) : SessionEvent()
+  
+  data class SetIntensity(val intensity: Int) : SessionEvent()
 }

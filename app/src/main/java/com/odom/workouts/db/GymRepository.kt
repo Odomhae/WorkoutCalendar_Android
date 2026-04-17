@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
+import java.time.LocalDate
+import java.time.YearMonth
 import kotlin.collections.filter
 import kotlin.collections.mapNotNull
 import kotlin.collections.sortedByDescending
@@ -140,7 +142,7 @@ class GymRepository(
   }
 
   // Calendar-specific methods
-  fun getWorkoutDatesForMonth(yearMonth: java.time.YearMonth): kotlinx.coroutines.flow.Flow<Set<java.time.LocalDate>> {
+  fun getWorkoutDatesForMonth(yearMonth: YearMonth): Flow<Set<LocalDate>> {
     val startDate = yearMonth.atDay(1).toString()
     val endDate = yearMonth.atEndOfMonth().toString()
     
@@ -148,7 +150,7 @@ class GymRepository(
       .map { dateStrings ->
         dateStrings.mapNotNull { dateString ->
           try {
-            java.time.LocalDate.parse(dateString)
+            LocalDate.parse(dateString)
           } catch (e: Exception) {
             null
           }
@@ -156,17 +158,35 @@ class GymRepository(
       }
   }
 
-  fun getSessionsForDate(date: java.time.LocalDate): kotlinx.coroutines.flow.Flow<List<com.odom.workouts.db.entities.Session>> {
+  fun getWorkoutIntensitiesForMonth(yearMonth: YearMonth): Flow<Map<LocalDate, Int>> {
+    val startDate = yearMonth.atDay(1).toString()
+    val endDate = yearMonth.atEndOfMonth().toString()
+    
+    return dao.getWorkoutIntensitiesInRange(startDate, endDate)
+      .map { intensities ->
+        intensities.mapNotNull { 
+          try {
+            val date = LocalDate.parse(it.workoutDate)
+            val intensity = it.maxIntensity ?: 0
+            date to intensity
+          } catch (e: Exception) {
+            null
+          }
+        }.toMap()
+      }
+  }
+
+  fun getSessionsForDate(date: LocalDate): Flow<List<Session>> {
     return dao.getSessionsForDate(date.toString())
   }
 
-  suspend fun getWorkoutCountForDate(date: java.time.LocalDate): Int {
+  suspend fun getWorkoutCountForDate(date: LocalDate): Int {
     return dao.getWorkoutCountForDate(date.toString())
   }
 
-  suspend fun createWorkoutForDate(date: java.time.LocalDate): Long {
+  suspend fun createWorkoutForDate(date: LocalDate): Long {
     val sessionStart = date.atStartOfDay()
-    val session = com.odom.workouts.db.entities.Session(start = sessionStart)
+    val session = Session(start = sessionStart)
     return insertSession(session)
   }
 }

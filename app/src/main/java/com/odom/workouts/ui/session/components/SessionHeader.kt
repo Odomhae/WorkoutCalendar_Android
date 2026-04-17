@@ -3,6 +3,8 @@ package com.odom.workouts.ui.session.components
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.keyframes
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -35,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
@@ -44,6 +48,7 @@ import androidx.compose.ui.unit.sp
 import com.odom.workouts.ui.SessionWrapper
 import com.odom.workouts.ui.TimerState
 import com.odom.workouts.ui.home.components.SessionDate
+import com.odom.workouts.ui.session.SessionEvent
 import com.odom.workouts.utils.ScaleAndSlideHorizontallyVisibility
 import com.odom.workouts.utils.ScaleVisibility
 import kotlinx.coroutines.launch
@@ -61,6 +66,7 @@ fun SessionHeader(
   onEndTime: () -> Unit,
   onStartTime: () -> Unit,
   onToggleEdit: () -> Unit,
+  onIntensityChange: (Int) -> Unit,
   timerState: TimerState,
   timerVisible: Boolean,
   onTimerButtonClick: () -> Unit,
@@ -175,6 +181,49 @@ fun SessionHeader(
         }
       }
     }
+
+    // Intensity Rating Selector
+    Row(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = 16.dp, vertical = 8.dp),
+      horizontalArrangement = Arrangement.Center,
+      verticalAlignment = Alignment.CenterVertically
+    ) {
+      Text(
+        text = "Intensity:",
+        style = MaterialTheme.typography.labelMedium,
+        modifier = Modifier.padding(end = 12.dp)
+      )
+      
+      (1..5).forEach { rating ->
+        val isSelected = sessionWrapper.session.intensity == rating
+        val intensityColor = when (rating) {
+          1 -> Color(0xFFE8F5E9)
+          2 -> Color(0xFFA5D6A7)
+          3 -> Color(0xFF66BB6A)
+          4 -> Color(0xFF43A047)
+          5 -> Color(0xFF1B5E20)
+          else -> Color.Gray
+        }
+
+        Box(
+          modifier = Modifier
+            .size(32.dp)
+            .padding(4.dp)
+            .clip(CircleShape)
+            .background(if (isSelected) intensityColor else Color.LightGray.copy(alpha = 0.3f))
+            .clickable(enabled = screenUnlocked) { onIntensityChange(rating) }
+            .then(if (isSelected) Modifier.scale(1.1f) else Modifier),
+          contentAlignment = Alignment.Center
+        ) {
+           if (isSelected) {
+             Icon(Icons.Default.Check, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
+           }
+        }
+      }
+    }
+
     Row(
       modifier = modifier
         .fillMaxWidth()

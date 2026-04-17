@@ -26,7 +26,8 @@ fun CalendarDay(
   isToday: Boolean,
   isCurrentMonth: Boolean,
   onDateSelected: (LocalDate) -> Unit,
-  modifier: Modifier = Modifier
+  modifier: Modifier = Modifier,
+  intensity: Int = 0
 ) {
   val backgroundColor = when {
     isSelected -> MaterialTheme.colorScheme.primaryContainer
@@ -39,6 +40,16 @@ fun CalendarDay(
     isSelected -> MaterialTheme.colorScheme.onPrimaryContainer
     isToday -> MaterialTheme.colorScheme.onSecondaryContainer
     else -> MaterialTheme.colorScheme.onSurface
+  }
+
+  // Intensity color mapping
+  val intensityColor = when (intensity) {
+    1 -> Color(0xFFE8F5E9) // Very Low - Light Green
+    2 -> Color(0xFFA5D6A7) // Low - Green
+    3 -> Color(0xFF66BB6A) // Medium - Medium Green
+    4 -> Color(0xFF43A047) // High - Dark Green
+    5 -> Color(0xFF1B5E20) // Very High - Deep Green
+    else -> MaterialTheme.colorScheme.primary // Default dot color if intensity is 0 but hasWorkout is true
   }
 
   Box(
@@ -63,13 +74,13 @@ fun CalendarDay(
       textAlign = TextAlign.Center
     )
     
-    // Workout indicator dot
+    // Workout indicator dot with intensity color
     if (hasWorkout && isCurrentMonth) {
       Box(
         modifier = Modifier
-          .size(6.dp)
+          .size(8.dp)
           .background(
-            color = MaterialTheme.colorScheme.primary,
+            color = intensityColor,
             shape = CircleShape
           )
           .align(Alignment.BottomCenter)

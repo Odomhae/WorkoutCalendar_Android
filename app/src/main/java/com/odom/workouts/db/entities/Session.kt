@@ -13,5 +13,6 @@ data class Session(
   @PrimaryKey(autoGenerate = true)
   val sessionId: Long = 0L,
   val start: LocalDateTime = LocalDateTime.now(),
-  val end: LocalDateTime? = null
+  val end: LocalDateTime? = null,
+  val intensity: Int? = null // 1-5 rating
 )

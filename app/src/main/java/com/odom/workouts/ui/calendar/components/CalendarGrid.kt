@@ -25,6 +25,7 @@ fun WorkoutCalendar(
   selectedDate: LocalDate,
   currentMonth: YearMonth,
   workoutDates: Set<LocalDate>,
+  workoutIntensities: Map<LocalDate, Int>,
   onDateSelected: (LocalDate) -> Unit,
   modifier: Modifier = Modifier
 ) {
@@ -40,6 +41,7 @@ fun WorkoutCalendar(
       selectedDate = selectedDate,
       currentMonth = currentMonth,
       workoutDates = workoutDates,
+      workoutIntensities = workoutIntensities,
       onDateSelected = onDateSelected
     )
   }
@@ -73,6 +75,7 @@ private fun CalendarDaysGrid(
   selectedDate: LocalDate,
   currentMonth: YearMonth,
   workoutDates: Set<LocalDate>,
+  workoutIntensities: Map<LocalDate, Int>,
   onDateSelected: (LocalDate) -> Unit
 ) {
   val firstDayOfMonth = currentMonth.atDay(1)
@@ -100,12 +103,14 @@ private fun CalendarDaysGrid(
             val isSelected = date.isEqual(selectedDate)
             val isToday = date.isEqual(today)
             val hasWorkout = workoutDates.contains(date)
+            val intensity = workoutIntensities[date] ?: 0
             val isCurrentMonth = YearMonth.from(date) == currentMonth
             
             CalendarDay(
               date = date,
               isSelected = isSelected,
               hasWorkout = hasWorkout,
+              intensity = intensity,
               isToday = isToday,
               isCurrentMonth = isCurrentMonth,
               onDateSelected = onDateSelected,

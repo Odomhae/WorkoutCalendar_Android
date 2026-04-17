@@ -123,14 +123,25 @@ interface GymDAO {
   fun getWorkoutDatesInRange(
     startDate: String, 
     endDate: String
-  ): kotlinx.coroutines.flow.Flow<List<String>>
+  ): Flow<List<String>>
+
+  @Query("""
+    SELECT DATE(start) as workoutDate, MAX(intensity) as maxIntensity
+    FROM sessions 
+    WHERE DATE(start) BETWEEN :startDate AND :endDate
+    GROUP BY DATE(start)
+  """)
+  fun getWorkoutIntensitiesInRange(
+    startDate: String,
+    endDate: String
+  ): Flow<List<WorkoutDateIntensity>>
 
   @Query("""
     SELECT * FROM sessions 
     WHERE DATE(start) = :date
     ORDER BY start DESC
   """)
-  fun getSessionsForDate(date: String): kotlinx.coroutines.flow.Flow<List<com.odom.workouts.db.entities.Session>>
+  fun getSessionsForDate(date: String): Flow<List<Session>>
 
   @Query("""
     SELECT COUNT(*) 
@@ -139,4 +150,3 @@ interface GymDAO {
   """)
   suspend fun getWorkoutCountForDate(date: String): Int
 }
-

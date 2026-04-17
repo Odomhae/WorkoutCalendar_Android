@@ -42,6 +42,17 @@ class CalendarViewModel @Inject constructor(
       initialValue = emptySet()
     )
 
+  // Flow of workout intensities for the current month
+  val workoutIntensitiesForMonth: StateFlow<Map<LocalDate, Int>> = currentMonth
+    .flatMapLatest { month ->
+      repo.getWorkoutIntensitiesForMonth(month)
+    }
+    .stateIn(
+      scope = viewModelScope,
+      started = kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000),
+      initialValue = emptyMap()
+    )
+
   // Workout data for selected date
   val workoutsForSelectedDate: StateFlow<List<ExerciseWrapper>> = selectedDate
     .flatMapLatest { date ->
